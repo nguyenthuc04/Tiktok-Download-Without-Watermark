@@ -27,12 +27,15 @@ class AudioPlayerActivity : AppCompatActivity() {
         val mediaController = MediaController(this)
         mediaController.setAnchorView(binding.mediaPlayer)
 
-        // Set up the VideoView
+        // Thiết lập Chế độ xem video
         binding.mediaPlayer.apply {
             setMediaController(mediaController)
             setVideoURI(Uri.parse(audioPath))
             requestFocus()
             start()
+        }
+        binding.backButton.setOnClickListener {
+            finish()
         }
     }
 

@@ -4,18 +4,27 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.thuc0502.tiktokdownloadwithoutwatermark.Fragment.AudioFragment
+import com.thuc0502.tiktokdownloadwithoutwatermark.Fragment.ImageFragment
 import com.thuc0502.tiktokdownloadwithoutwatermark.Fragment.VideoFragment
 
 class StoragePagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
     override fun getItem(position: Int): Fragment {
-        return if (position == 0) VideoFragment() else AudioFragment()
+        return when (position) {
+            0 -> VideoFragment()
+            1 -> AudioFragment()
+            else -> ImageFragment()
+        }
     }
 
     override fun getCount(): Int {
-        return 2
+        return 3
     }
 
     override fun getPageTitle(position: Int): CharSequence? {
-        return if (position == 0) "Videos" else "Audios"
+        return when (position) {
+            0 -> "Videos"
+            1 -> "Audios"
+            else -> "Images"
+        }
     }
 }

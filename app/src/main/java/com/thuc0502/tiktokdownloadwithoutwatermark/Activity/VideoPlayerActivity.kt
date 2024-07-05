@@ -22,14 +22,14 @@ class VideoPlayerActivity : AppCompatActivity() {
             v.setPadding(systemBars.left ,systemBars.top ,systemBars.right ,systemBars.bottom)
             insets
         }
-        // Get the video path from the Intent
+        // Nhận đường dẫn video từ Intent
         val videoPath = intent.getStringExtra("VIDEO_PATH")
 
-        // Create a MediaController
+        // Tạo một MediaController
         val mediaController = MediaController(this)
         mediaController.setAnchorView(binding.videoView)
 
-        // Set up the VideoView
+        // Thiết lập Chế độ xem video
         binding.videoView.apply {
             setMediaController(mediaController)
             setVideoURI(Uri.parse(videoPath))
