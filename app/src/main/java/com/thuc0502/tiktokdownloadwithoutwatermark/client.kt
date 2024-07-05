@@ -18,8 +18,8 @@ suspend fun getTikTokVideoInfo(link: String): TikTokVideoInfo? {
     val request = Request.Builder()
         .url("https://tiktok-download-without-watermark.p.rapidapi.com/analysis?url=$link")
         .get()
-//        .addHeader("x-rapidapi-key" ,"c62d376226msh62c5e1c2cb3b6ccp1cbd50jsn2b59bcff3362")
-        .addHeader("x-rapidapi-key","b90c2b49a8msh5db6277d2c47139p165cfdjsna3adbf9fc5b2")
+        .addHeader("x-rapidapi-key" ,"c62d376226msh62c5e1c2cb3b6ccp1cbd50jsn2b59bcff3362")
+//        .addHeader("x-rapidapi-key","b90c2b49a8msh5db6277d2c47139p165cfdjsna3adbf9fc5b2")
         .addHeader("x-rapidapi-host", "tiktok-download-without-watermark.p.rapidapi.com")
         .build()
 

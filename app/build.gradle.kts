@@ -39,6 +39,8 @@ android {
 }
 
 dependencies {
+
+        implementation ("androidx.viewpager2:viewpager2:1.0.0")
     implementation("pub.devrel:easypermissions:3.0.0")
     implementation ("com.droidninja:filepicker:2.2.5")
     implementation ("com.squareup.picasso:picasso:2.71828")

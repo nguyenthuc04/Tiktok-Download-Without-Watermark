@@ -1,12 +1,17 @@
 package com.thuc0502.tiktokdownloadwithoutwatermark.Activity
 
 import android.annotation.SuppressLint
-import android.app.ProgressDialog
+import android.app.Dialog
 import android.content.ClipboardManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.MotionEvent
 import androidx.activity.enableEdgeToEdge
@@ -98,20 +103,30 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupOpenTikTokButtonClickListener() {
         binding.btnOpentiktok.setOnClickListener {
+            // Thay đổi màu backgroundTint
+            binding.btnOpentiktok.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#E4CA43"))
+
             openTikTokApp()
+
+            // Tạo một Handler để đặt lại màu sau 500ms
+            Handler(Looper.getMainLooper()).postDelayed({
+                binding.btnOpentiktok.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FF424242"))
+            }, 10)
         }
     }
 
     private fun openTikTokApp() {
         val tikTokPackageName = "com.ss.android.ugc.trill"
-        val intent = packageManager.getLaunchIntentForPackage(tikTokPackageName)
-        if (intent != null) {
-            try {
-                startActivity(intent)
-            } catch (e: Exception) {
-                Log.e("OpenTikTok" ,"Error opening TikTok" ,e)
-            }
-        } else {
+        val tikTokMainActivity = "com.ss.android.ugc.aweme.main.MainActivity"
+
+        val intent = Intent().apply {
+            component = ComponentName(tikTokPackageName, tikTokMainActivity)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            Log.e("OpenTikTok", "Error opening TikTok", e)
             openTikTokInPlayStore(tikTokPackageName)
         }
     }
@@ -139,7 +154,14 @@ class MainActivity : AppCompatActivity() {
     private fun setupStorageDownloadButtonClickListener() {
         binding.btnStoraDownload.setOnClickListener {
             val intent = Intent(this ,StorageActivity::class.java)
+
+            binding.btnStoraDownload.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#E4CA43"))
             startActivity(intent)
+
+            // Tạo một Handler để đặt lại màu sau 200ms
+            Handler(Looper.getMainLooper()).postDelayed({
+                binding.btnStoraDownload.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FF424242"))
+            }, 10)
         }
     }
 
@@ -159,11 +181,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showVideoInfoBottomSheet(link: String) {
-        val progressDialog = ProgressDialog(this).apply {
-            setMessage("Loading data...")
+        val dialog = Dialog(this).apply {
+            setContentView(R.layout.custom_progress_dialog)
             setCancelable(false)
-            show()
+            window?.setBackgroundDrawableResource(R.drawable.progress_dialog)
+            window?.setLayout(600, 200)
         }
+        dialog.show()
 
         lifecycleScope.launch {
             try {
@@ -171,7 +195,7 @@ class MainActivity : AppCompatActivity() {
                     getTikTokVideoInfo(link)
                 }
 
-                progressDialog.dismiss()
+                dialog.dismiss()
 
                 videoInfo?.let {
                     lastVideoInfo = it
@@ -179,7 +203,7 @@ class MainActivity : AppCompatActivity() {
                     videoInfoBottomSheet.show(supportFragmentManager ,"VideoInfoBottomSheet")
                 } ?: showToast("Link không hợp lệ hoặc không thể tải dữ liệu video")
             } catch (e: Exception) {
-                progressDialog.dismiss()
+                dialog.dismiss()
                 e.printStackTrace()
             }
         }

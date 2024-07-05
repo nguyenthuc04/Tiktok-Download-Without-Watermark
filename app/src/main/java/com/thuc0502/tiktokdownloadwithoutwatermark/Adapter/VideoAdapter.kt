@@ -38,6 +38,7 @@ class VideoAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder ,position: Int) {
         binding = ItemVideoBinding.bind(holder.itemView)
+        binding.txtName.text = files[position].name
         binding.imageView.setImageBitmap(
             ThumbnailUtils.createVideoThumbnail(
                 files[position].absolutePath ,

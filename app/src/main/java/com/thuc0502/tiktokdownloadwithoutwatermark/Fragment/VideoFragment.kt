@@ -7,9 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.thuc0502.tiktokdownloadwithoutwatermark.Adapter.VideoAdapter
 import com.thuc0502.tiktokdownloadwithoutwatermark.databinding.FragmentVideoBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class VideoFragment : Fragment() {
@@ -24,33 +28,46 @@ class VideoFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View ,savedInstanceState: Bundle?) {
-        super.onViewCreated(view ,savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         binding = FragmentVideoBinding.bind(view)
-        val videos = getDownloadedVideos()
 
-        if (videos.isEmpty()) {
-            binding.ivNoData.visibility = View.VISIBLE
-            binding.tvNoData.visibility = View.VISIBLE
-            binding.videoRecyclerView.visibility = View.GONE
-            binding.layout.setBackgroundColor(Color.GRAY)
-        } else {
-            binding.ivNoData.visibility = View.GONE
-            binding.tvNoData.visibility = View.GONE
-            binding.videoRecyclerView.visibility = View.VISIBLE
+        // Hiển thị ProgressBar
+        binding.progressBar.visibility = View.VISIBLE
 
-            binding.layout.setBackgroundColor(Color.WHITE)
+        // Tải dữ liệu trên một luồng khác
+        lifecycleScope.launch(Dispatchers.IO) {
+            val videos = getDownloadedVideos()
 
-            // Hiển thị danh sách video
-            videoAdapter = VideoAdapter(
-                videos ,
-                binding.ivNoData ,
-                binding.tvNoData ,
-                binding.videoRecyclerView ,
-                binding.layout
-            )
-            binding.videoRecyclerView.layoutManager = GridLayoutManager(context ,2)
-            binding.videoRecyclerView.adapter = videoAdapter
+            // Cập nhật giao diện người dùng trên luồng chính
+            withContext(Dispatchers.Main) {
+                if (videos.isEmpty()) {
+                    binding.ivNoData.visibility = View.VISIBLE
+                    binding.tvNoData.visibility = View.VISIBLE
+                    binding.videoRecyclerView.visibility = View.GONE
+                    binding.layout.setBackgroundColor(Color.GRAY)
+                } else {
+                    binding.ivNoData.visibility = View.GONE
+                    binding.tvNoData.visibility = View.GONE
+                    binding.videoRecyclerView.visibility = View.VISIBLE
+
+                    binding.layout.setBackgroundColor(Color.WHITE)
+
+                    // Hiển thị danh sách video
+                    videoAdapter = VideoAdapter(
+                        videos,
+                        binding.ivNoData,
+                        binding.tvNoData,
+                        binding.videoRecyclerView,
+                        binding.layout
+                    )
+                    binding.videoRecyclerView.layoutManager = GridLayoutManager(context, 2)
+                    binding.videoRecyclerView.adapter = videoAdapter
+                }
+
+                // Ẩn ProgressBar
+                binding.progressBar.visibility = View.GONE
+            }
         }
     }
 

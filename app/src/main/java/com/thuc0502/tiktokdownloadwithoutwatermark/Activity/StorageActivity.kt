@@ -6,6 +6,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayoutMediator
 import com.thuc0502.tiktokdownloadwithoutwatermark.Adapter.StoragePagerAdapter
 import com.thuc0502.tiktokdownloadwithoutwatermark.R
 import com.thuc0502.tiktokdownloadwithoutwatermark.databinding.ActivityStorageBinding
@@ -13,6 +15,7 @@ import com.thuc0502.tiktokdownloadwithoutwatermark.databinding.ActivityStorageBi
 
 class StorageActivity : AppCompatActivity() {
     private lateinit var binding: ActivityStorageBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -38,9 +41,28 @@ class StorageActivity : AppCompatActivity() {
     }
 
     private fun setupTabs() {
-        val adapter = StoragePagerAdapter(supportFragmentManager)
+        val adapter = StoragePagerAdapter(this)
         binding.viewPager.adapter = adapter
-        binding.tabLayout.setupWithViewPager(binding.viewPager)
+        binding.viewPager.offscreenPageLimit = 2
+
+        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+            tab.text = when (position) {
+                0 -> getString(R.string.videos_tab_title)
+                1 -> getString(R.string.audios_tab_title)
+                else -> getString(R.string.images_tab_title)
+            }
+        }.attach()
+
+        // Lắng nghe sự kiện chuyển đổi tab
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                val fragment = adapter.createFragment(position)
+                if (fragment is LoadableFragment) {
+                    fragment.loadData()
+                }
+            }
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -55,4 +77,7 @@ class StorageActivity : AppCompatActivity() {
         }
     }
 
+}
+interface LoadableFragment {
+    fun loadData()
 }
