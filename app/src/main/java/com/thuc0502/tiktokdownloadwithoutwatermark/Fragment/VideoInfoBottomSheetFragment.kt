@@ -38,35 +38,40 @@ import java.util.concurrent.atomic.AtomicBoolean
 class VideoInfoBottomSheetFragment : BottomSheetDialogFragment() {
     private lateinit var binding: FragmentVideoInfoBottomSheetBinding
     private lateinit var videoInfo: TikTokVideoInfo
+
     companion object {
-            fun newInstance(videoInfo: TikTokVideoInfo): VideoInfoBottomSheetFragment {
-                val fragment = VideoInfoBottomSheetFragment()
-                fragment.videoInfo = videoInfo
-                return fragment
-            }
+        fun newInstance(videoInfo: TikTokVideoInfo): VideoInfoBottomSheetFragment {
+            val fragment = VideoInfoBottomSheetFragment()
+            fragment.videoInfo = videoInfo
+            return fragment
+        }
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater ,
-        container: ViewGroup? ,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         binding = FragmentVideoInfoBottomSheetBinding.inflate(inflater, container, false)
         dialog?.setCancelable(false)
         return binding.root
     }
-    override fun getTheme(): Int {
-        return R.style.Theme_Material3BottomSheetDialog
-    }
+
+    override fun getTheme(): Int = R.style.Theme_Material3BottomSheetDialog
+
     @SuppressLint("SetTextI18n")
-    override fun onViewCreated(view: View ,savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         // Sử dụng videoInfo đã được truyền vào để cập nhật giao diện người dùng
         binding.tvNickName.text = videoInfo.nickname
         binding.tvTitle.text = videoInfo.title
 
-        Glide.with(requireContext())
+        Glide
+            .with(requireContext())
             .load(videoInfo.authorAvatar)
             .apply(RequestOptions.circleCropTransform())
             .into(binding.imgAvatar)
@@ -76,58 +81,94 @@ class VideoInfoBottomSheetFragment : BottomSheetDialogFragment() {
 
     private fun setOnClickListener() {
         with(binding) {
-            setupDownloadButton(btnDowLoadVideo, "Tải xuống video (${videoInfo.size})", videoInfo.playUrl, ::downloadVideo,videoInfo.size)
-            setupDownloadButton(btnDownloadSound, "Tải nhạc xuống (${videoInfo.musicSize})", videoInfo.music, ::downloadSound,videoInfo.size)
+            setupDownloadButton(
+                btnDowLoadVideo,
+                "Tải xuống video (${videoInfo.size})",
+                videoInfo.playUrl,
+                ::downloadVideo,
+                videoInfo.size,
+            )
+            setupDownloadButton(
+                btnDownloadSound,
+                "Tải nhạc xuống (${videoInfo.musicSize})",
+                videoInfo.music,
+                ::downloadSound,
+                videoInfo.size,
+            )
             btnClose.setOnClickListener { dismiss() }
         }
     }
-    private fun setupDownloadButton(button: Button ,text: String ,url: String ,downloadFunction: (String,String) -> Unit,data:String) {
+
+    private fun setupDownloadButton(
+        button: Button,
+        text: String,
+        url: String,
+        downloadFunction: (String, String) -> Unit,
+        data: String,
+    ) {
         button.apply {
             this.text = text
             setOnClickListener {
-                checkPermissionAndDownload(data,url, downloadFunction)
+                checkPermissionAndDownload(data, url, downloadFunction)
             }
         }
     }
-    private fun checkPermissionAndDownload(data: String ,url: String, downloadFunction: (String,String) -> Unit) {
-        val permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET)
 
-        if (permissions.all { permission -> ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED }) {
-            downloadFunction(data,url)
+    private fun checkPermissionAndDownload(
+        data: String,
+        url: String,
+        downloadFunction: (String, String) -> Unit,
+    ) {
+        val permissions =
+            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET)
+
+        if (permissions.all { permission ->
+                ContextCompat.checkSelfPermission(requireContext(), permission) ==
+                    PackageManager.PERMISSION_GRANTED
+            }
+        ) {
+            downloadFunction(data, url)
         } else {
             ActivityCompat.requestPermissions(requireActivity(), permissions, 0)
         }
     }
 
-    private fun downloadSound(data: String,url: String) {
-        downloadFile(data,url, "TikMate/Sound", ".mp3") { intent ->
+    private fun downloadSound(
+        data: String,
+        url: String,
+    ) {
+        downloadFile(data, url, "TikMate/Sound", ".mp3") { intent ->
             intent.putExtra("tab", "Audios")
             startActivity(intent)
         }
     }
 
-    private fun downloadVideo(data: String,url: String) {
-        downloadFile(data,url, "TikMate/Video", ".mp4") { intent ->
-            intent.putExtra("tab", "Videos")
-            startActivity(intent)
+    private fun downloadVideo(
+        data: String,
+        url: String,
+    ) {
+        downloadFile(data, url, "TikMate/Video", ".mp4") {
+            it.putExtra("tab", "Videos")
+            startActivity(it)
         }
     }
 
     private suspend fun downloadData(
-        client: OkHttpClient ,
-        request: Request ,
-        file: File ,
-        progressBar: ProgressBar ,
-        txtData1: TextView ,
-        isCancelled: AtomicBoolean
+        client: OkHttpClient,
+        request: Request,
+        file: File,
+        progressBar: ProgressBar,
+        txtData1: TextView,
+        isCancelled: AtomicBoolean,
     ) {
         val response = client.newCall(request).execute()
 
         if (response.isSuccessful) {
             val inputStream = response.body?.byteStream()
-            val outputStream = withContext(Dispatchers.IO) {
-                FileOutputStream(file)
-            }
+            val outputStream =
+                withContext(Dispatchers.IO) {
+                    FileOutputStream(file)
+                }
 
             val buffer = ByteArray(2048)
             var bytesRead: Int
@@ -136,7 +177,8 @@ class VideoInfoBottomSheetFragment : BottomSheetDialogFragment() {
 
             while (withContext(Dispatchers.IO) {
                     inputStream?.read(buffer).also { bytesRead = it ?: -1 }
-                } != -1) {
+                } != -1
+            ) {
                 if (isCancelled.get()) {
                     file.delete() // Delete the partially downloaded file
                     break
@@ -149,14 +191,15 @@ class VideoInfoBottomSheetFragment : BottomSheetDialogFragment() {
                     // Update the txtData1 text view
                     val downloadedMB = totalBytesRead.toFloat() / (1024 * 1024)
                     val downloadedKB = totalBytesRead.toFloat() / 1024
-                    txtData1.text = if (downloadedMB < 1) {
-                        String.format("%.1f KB", downloadedKB)
-                    } else {
-                        String.format("%.1f MB", downloadedMB)
-                    }
+                    txtData1.text =
+                        if (downloadedMB < 1) {
+                            String.format("%.1f KB", downloadedKB)
+                        } else {
+                            String.format("%.1f MB", downloadedMB)
+                        }
                 }
                 withContext(Dispatchers.IO) {
-                    outputStream.write(buffer ,0 ,bytesRead)
+                    outputStream.write(buffer, 0, bytesRead)
                 }
             }
             withContext(Dispatchers.IO) {
@@ -167,19 +210,29 @@ class VideoInfoBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun downloadFile(data: String, url: String, directory: String, extension: String, onSuccess: (Intent) -> Unit) {
+    private fun downloadFile(
+        data: String,
+        url: String,
+        directory: String,
+        extension: String,
+        onSuccess: (Intent) -> Unit,
+    ) {
         val isCancelled = AtomicBoolean(false)
         lifecycleScope.launch {
-            val dialog = Dialog(requireContext()).apply {
-                setContentView(R.layout.custom_progress_dialog_download)
-                setCancelable(false)
-                window?.setBackgroundDrawableResource(R.drawable.progress_dialog)
-                window?.setLayout(600, 400)
-                val btnCancel = findViewById<Button>(R.id.btnCancel)
-                btnCancel.setOnClickListener {
-                    isCancelled.set(true)
+            val dialog =
+                Dialog(requireContext()).apply {
+                    setContentView(R.layout.custom_progress_dialog_download)
+                    setCancelable(false)
+                    window?.setBackgroundDrawableResource(R.drawable.progress_dialog)
+                    window?.setLayout(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                    )
+                    val btnCancel = findViewById<Button>(R.id.btnCancel)
+                    btnCancel.setOnClickListener {
+                        isCancelled.set(true)
+                    }
                 }
-            }
             dialog.show()
             val progressBar = dialog.findViewById<ProgressBar>(R.id.progressBar3)
             val txtData1 = dialog.findViewById<TextView>(R.id.txtData1)
@@ -189,11 +242,15 @@ class VideoInfoBottomSheetFragment : BottomSheetDialogFragment() {
                 withContext(Dispatchers.IO) {
                     val client = OkHttpClient()
                     val request = Request.Builder().url(url).build()
-                    val dir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), directory)
+                    val dir =
+                        File(
+                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                            directory,
+                        )
                     dir.mkdirs()
                     val file = File(dir, generateRandomFileName(extension))
 
-                    downloadData(client ,request ,file ,progressBar ,txtData1 ,isCancelled)
+                    downloadData(client, request, file, progressBar, txtData1, isCancelled)
 
                     withContext(Dispatchers.Main) {
                         if (!isCancelled.get()) {

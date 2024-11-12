@@ -19,16 +19,21 @@ import java.io.File
 class VideoFragment : Fragment() {
     private lateinit var videoAdapter: VideoAdapter
     private lateinit var binding: FragmentVideoBinding
+
     override fun onCreateView(
-        inflater: LayoutInflater ,
-        container: ViewGroup? ,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
-        binding = FragmentVideoBinding.inflate(inflater ,container ,false)
+        binding = FragmentVideoBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentVideoBinding.bind(view)
 
@@ -54,13 +59,14 @@ class VideoFragment : Fragment() {
                     binding.layout.setBackgroundColor(Color.WHITE)
 
                     // Hiển thị danh sách video
-                    videoAdapter = VideoAdapter(
-                        videos,
-                        binding.ivNoData,
-                        binding.tvNoData,
-                        binding.videoRecyclerView,
-                        binding.layout
-                    )
+                    videoAdapter =
+                        VideoAdapter(
+                            videos,
+                            binding.ivNoData,
+                            binding.tvNoData,
+                            binding.videoRecyclerView,
+                            binding.layout,
+                        )
                     binding.videoRecyclerView.layoutManager = GridLayoutManager(context, 2)
                     binding.videoRecyclerView.adapter = videoAdapter
                 }
@@ -72,10 +78,11 @@ class VideoFragment : Fragment() {
     }
 
     private fun getDownloadedVideos(): Array<File> {
-        val videoDir = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) ,
-            "TikMate/Video"
-        )
+        val videoDir =
+            File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                "TikMate/Video",
+            )
         return videoDir.listFiles() ?: emptyArray()
     }
 
@@ -84,6 +91,5 @@ class VideoFragment : Fragment() {
         if (::videoAdapter.isInitialized) {
             videoAdapter.dismissPopupMenu()
         }
-
     }
 }

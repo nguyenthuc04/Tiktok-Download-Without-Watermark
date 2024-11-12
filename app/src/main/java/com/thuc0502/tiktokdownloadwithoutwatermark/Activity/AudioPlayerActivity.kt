@@ -11,16 +11,16 @@ import com.thuc0502.tiktokdownloadwithoutwatermark.R
 import com.thuc0502.tiktokdownloadwithoutwatermark.databinding.ActivityAudioPlayerBinding
 
 class AudioPlayerActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityAudioPlayerBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v ,insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left ,systemBars.top ,systemBars.right ,systemBars.bottom)
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
         val audioPath = intent.getStringExtra("AUDIO_PATH")
@@ -38,5 +38,4 @@ class AudioPlayerActivity : AppCompatActivity() {
             finish()
         }
     }
-
 }

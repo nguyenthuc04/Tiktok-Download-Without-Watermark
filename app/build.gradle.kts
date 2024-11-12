@@ -40,9 +40,10 @@ android {
 
 dependencies {
 
-        implementation ("androidx.viewpager2:viewpager2:1.0.0")
+    implementation ("androidx.viewpager2:viewpager2:1.0.0")
     implementation("pub.devrel:easypermissions:3.0.0")
-    implementation ("com.droidninja:filepicker:2.2.5")
+//    implementation ("com.droidninja:filepicker:2.2.5")
+//    implementation ("com.github.DroidNinja:Android-FilePicker:-fe12cc36b2-1")
     implementation ("com.squareup.picasso:picasso:2.71828")
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")

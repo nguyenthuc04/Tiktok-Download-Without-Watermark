@@ -18,16 +18,20 @@ import java.io.File
 class AudioFragment : Fragment() {
     private lateinit var audioAdapter: AudioAdapter
     private lateinit var binding: FragmentAudioBinding
+
     override fun onCreateView(
-        inflater: LayoutInflater ,
-        container: ViewGroup? ,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
-        binding = FragmentAudioBinding.inflate(inflater ,container ,false)
+        binding = FragmentAudioBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentAudioBinding.bind(view)
 
@@ -53,13 +57,14 @@ class AudioFragment : Fragment() {
                     binding.layout.setBackgroundColor(Color.WHITE)
 
                     // Hiển thị danh sách audio
-                    audioAdapter = AudioAdapter(
-                        audios,
-                        binding.ivNoData,
-                        binding.tvNoData,
-                        binding.audioRecyclerView,
-                        binding.layout
-                    )
+                    audioAdapter =
+                        AudioAdapter(
+                            audios,
+                            binding.ivNoData,
+                            binding.tvNoData,
+                            binding.audioRecyclerView,
+                            binding.layout,
+                        )
                     binding.audioRecyclerView.adapter = audioAdapter
                 }
 
@@ -70,10 +75,11 @@ class AudioFragment : Fragment() {
     }
 
     private fun getDownloadedAudios(): Array<File> {
-        val audioDir = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) ,
-            "TikMate/Sound"
-        )
+        val audioDir =
+            File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                "TikMate/Sound",
+            )
         return audioDir.listFiles() ?: emptyArray()
     }
 

@@ -7,16 +7,15 @@ import com.thuc0502.tiktokdownloadwithoutwatermark.Fragment.AudioFragment
 import com.thuc0502.tiktokdownloadwithoutwatermark.Fragment.ImageFragment
 import com.thuc0502.tiktokdownloadwithoutwatermark.Fragment.VideoFragment
 
-class StoragePagerAdapter(activity: AppCompatActivity) : FragmentStateAdapter(activity) {
-    override fun getItemCount(): Int {
-        return 3
-    }
+class StoragePagerAdapter(
+    activity: AppCompatActivity,
+) : FragmentStateAdapter(activity) {
+    override fun getItemCount(): Int = 3
 
-    override fun createFragment(position: Int): Fragment {
-        return when (position) {
+    override fun createFragment(position: Int): Fragment =
+        when (position) {
             0 -> VideoFragment()
             1 -> AudioFragment()
             else -> ImageFragment()
         }
-    }
 }

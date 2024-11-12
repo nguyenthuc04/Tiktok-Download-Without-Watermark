@@ -11,17 +11,17 @@ import java.net.MalformedURLException
 import java.net.URL
 import java.util.UUID
 
-
 suspend fun getTikTokVideoInfo(link: String): TikTokVideoInfo? {
-
     val client = OkHttpClient()
-    val request = Request.Builder()
-        .url("https://tiktok-download-without-watermark.p.rapidapi.com/analysis?url=$link")
-        .get()
-        .addHeader("x-rapidapi-key" ,"c62d376226msh62c5e1c2cb3b6ccp1cbd50jsn2b59bcff3362")
-//        .addHeader("x-rapidapi-key","b90c2b49a8msh5db6277d2c47139p165cfdjsna3adbf9fc5b2")
-        .addHeader("x-rapidapi-host", "tiktok-download-without-watermark.p.rapidapi.com")
-        .build()
+    val request =
+        Request
+            .Builder()
+            .url("https://tiktok-download-without-watermark.p.rapidapi.com/analysis?url=$link")
+            .get()
+//            .addHeader("x-rapidapi-key", "c62d376226msh62c5e1c2cb3b6ccp1cbd50jsn2b59bcff3362")
+        .addHeader("x-rapidapi-key","b90c2b49a8msh5db6277d2c47139p165cfdjsna3adbf9fc5b2")
+            .addHeader("x-rapidapi-host", "tiktok-download-without-watermark.p.rapidapi.com")
+            .build()
 
     val response = client.newCall(request).execute()
     val responseBody = response.body?.string()
@@ -32,7 +32,7 @@ suspend fun getTikTokVideoInfo(link: String): TikTokVideoInfo? {
     }
 
     val gson = Gson()
-    val jsonObject = gson.fromJson(responseBody ,JsonObject::class.java)
+    val jsonObject = gson.fromJson(responseBody, JsonObject::class.java)
 
     if (!jsonObject.has("data")) {
         println("Response does not contain 'data' field")
@@ -52,15 +52,15 @@ suspend fun getTikTokVideoInfo(link: String): TikTokVideoInfo? {
     val musicSize = withContext(Dispatchers.IO) { getSizeUrl(data.get("music").asString) }
 
     return TikTokVideoInfo(
-        awemeId ,
-        title ,
-        playUrl ,
-        authorAvatar ,
-        authorUniqueId ,
-        music ,
+        awemeId,
+        title,
+        playUrl,
+        authorAvatar,
+        authorUniqueId,
+        music,
         nickname,
         size,
-        musicSize
+        musicSize,
     )
 }
 
@@ -77,26 +77,29 @@ fun convertBytesToReadableSize(sizeInBytes: Long): String {
 
 suspend fun getSizeUrl(url: String): String? {
     val client = OkHttpClient()
-    val request = Request.Builder().url(url).head()
-        .build()
+    val request =
+        Request
+            .Builder()
+            .url(url)
+            .head()
+            .build()
     val response = client.newCall(request).execute()
     val sizeInBytes = response.header("Content-Length")?.toLongOrNull()
 
     return sizeInBytes?.let { convertBytesToReadableSize(it) }
 }
 
-fun generateRandomFileName(extension: String): String {
-    return UUID.randomUUID().toString() + extension
-}
-fun isValidUrl(url: String): Boolean {
-    return try {
+fun generateRandomFileName(extension: String): String = UUID.randomUUID().toString() + extension
+
+fun isValidUrl(url: String): Boolean =
+    try {
         URL(url)
         true
     } catch (e: MalformedURLException) {
         false
     }
-}
- suspend fun main() {
+
+suspend fun main() {
     val link = "https://www.tiktok.com/@thuy_lcc/video/7359534766216973575?_r=1&_t=8nhb69725mT"
     val videoInfo = getTikTokVideoInfo(link)
     if (videoInfo != null) {
@@ -107,11 +110,12 @@ fun isValidUrl(url: String): Boolean {
         println("Author Unique ID: ${videoInfo.authorUniqueId}")
         println("Music URL: ${videoInfo.music}")
         println("Nickname: ${videoInfo.nickname}")
-
     } else {
         println("Failed to fetch video information")
     }
-    val size = getSizeUrl("https:\\/\\/v16m-default.akamaized.net\\/d998495548a5d60f84b9edfe495c6188\\/66851f4c\\/video\\/tos\\/alisg\\/tos-alisg-pve-0037c001\\/oMmPcnhgTBpQIAFRgBNIBfwhqMEvgof56zGDEa\\/?a=0&bti=OUBzOTg7QGo6OjZAL3AjLTAzYCMxNDNg&ch=0&cr=0&dr=0&lr=all&cd=0%7C0%7C0%7C0&cv=1&br=4924&bt=2462&cs=0&ds=6&ft=XE5bCqT0m7jPD12gnaF73wUSx3yKMeF~O5&mime_type=video_mp4&qs=0&rc=Mzg8MzY1Njk0Ojs1ZTM8OUBpam54M2o5cm47cjMzODczNEA0NDJiYzYvXi4xMTQ2My1iYSNqYTM1MmRzbWxgLS1kMWBzcw%3D%3D&vvpl=1&l=2024070303491557C93F004EC40D33A332&btag=e00090000")
+    val size =
+        getSizeUrl(
+            "https:\\/\\/v16m-default.akamaized.net\\/d998495548a5d60f84b9edfe495c6188\\/66851f4c\\/video\\/tos\\/alisg\\/tos-alisg-pve-0037c001\\/oMmPcnhgTBpQIAFRgBNIBfwhqMEvgof56zGDEa\\/?a=0&bti=OUBzOTg7QGo6OjZAL3AjLTAzYCMxNDNg&ch=0&cr=0&dr=0&lr=all&cd=0%7C0%7C0%7C0&cv=1&br=4924&bt=2462&cs=0&ds=6&ft=XE5bCqT0m7jPD12gnaF73wUSx3yKMeF~O5&mime_type=video_mp4&qs=0&rc=Mzg8MzY1Njk0Ojs1ZTM8OUBpam54M2o5cm47cjMzODczNEA0NDJiYzYvXi4xMTQ2My1iYSNqYTM1MmRzbWxgLS1kMWBzcw%3D%3D&vvpl=1&l=2024070303491557C93F004EC40D33A332&btag=e00090000",
+        )
     println(size)
-
 }

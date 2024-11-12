@@ -34,6 +34,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var lastVideoInfo: TikTokVideoInfo? = null
 
+    companion object {
+        const val DIALOG_WIDTH = 600
+        const val DIALOG_HEIGHT = 200
+        const val DELAY_TIME = 10L
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupUI()
@@ -44,9 +50,9 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v ,insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left ,systemBars.top ,systemBars.right ,systemBars.bottom)
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
     }
@@ -62,9 +68,15 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupEditTextTouchListener() {
-        binding.editTextText.setOnTouchListener { _ ,event ->
+        binding.editTextText.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_UP) {
-                if (event.rawX >= (binding.editTextText.right - binding.editTextText.compoundDrawables[2].bounds.width())) {
+                if (event.rawX >= (
+                        binding.editTextText.right -
+                            binding.editTextText.compoundDrawables[2]
+                                .bounds
+                                .width()
+                    )
+                ) {
                     binding.editTextText.setText("")
                     return@setOnTouchListener true
                 }
@@ -104,13 +116,15 @@ class MainActivity : AppCompatActivity() {
     private fun setupOpenTikTokButtonClickListener() {
         binding.btnOpentiktok.setOnClickListener {
             // Thay đổi màu backgroundTint
-            binding.btnOpentiktok.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#E4CA43"))
+            binding.btnOpentiktok.backgroundTintList =
+                ColorStateList.valueOf(Color.parseColor("#E4CA43"))
 
             openTikTokApp()
 
             // Tạo một Handler để đặt lại màu sau 500ms
             Handler(Looper.getMainLooper()).postDelayed({
-                binding.btnOpentiktok.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FF424242"))
+                binding.btnOpentiktok.backgroundTintList =
+                    ColorStateList.valueOf(Color.parseColor("#FF424242"))
             }, 10)
         }
     }
@@ -119,10 +133,11 @@ class MainActivity : AppCompatActivity() {
         val tikTokPackageName = "com.ss.android.ugc.trill"
         val tikTokMainActivity = "com.ss.android.ugc.aweme.main.MainActivity"
 
-        val intent = Intent().apply {
-            component = ComponentName(tikTokPackageName, tikTokMainActivity)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
+        val intent =
+            Intent().apply {
+                component = ComponentName(tikTokPackageName, tikTokMainActivity)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
         try {
             startActivity(intent)
         } catch (e: Exception) {
@@ -132,10 +147,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openTikTokInPlayStore(tikTokPackageName: String) {
-        val playStoreIntent = Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse("market://details?id=$tikTokPackageName")
-            setPackage("com.android.vending")
-        }
+        val playStoreIntent =
+            Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse("market://details?id=$tikTokPackageName")
+                setPackage("com.android.vending")
+            }
         if (playStoreIntent.resolveActivity(packageManager) != null) {
             startActivity(playStoreIntent)
         } else {
@@ -144,24 +160,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openTikTokInBrowser(tikTokPackageName: String) {
-        val browserIntent = Intent(
-            Intent.ACTION_VIEW ,
-            Uri.parse("https://play.google.com/store/apps/details?id=$tikTokPackageName")
-        )
+        val browserIntent =
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://play.google.com/store/apps/details?id=$tikTokPackageName"),
+            )
         startActivity(browserIntent)
     }
 
     private fun setupStorageDownloadButtonClickListener() {
         binding.btnStoraDownload.setOnClickListener {
-            val intent = Intent(this ,StorageActivity::class.java)
+            val intent = Intent(this, StorageActivity::class.java)
 
-            binding.btnStoraDownload.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#E4CA43"))
+            binding.btnStoraDownload.backgroundTintList =
+                ColorStateList.valueOf(Color.parseColor("#E4CA43"))
             startActivity(intent)
 
             // Tạo một Handler để đặt lại màu sau 200ms
             Handler(Looper.getMainLooper()).postDelayed({
-                binding.btnStoraDownload.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FF424242"))
-            }, 10)
+                binding.btnStoraDownload.backgroundTintList =
+                    ColorStateList.valueOf(Color.parseColor("#FF424242"))
+            }, DELAY_TIME)
         }
     }
 
@@ -175,32 +194,34 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupUsageButtonClickListener() {
         binding.btnCachSuDung.setOnClickListener {
-            val intent = Intent(this ,UsingActivity::class.java)
+            val intent = Intent(this, UsingActivity::class.java)
             startActivity(intent)
         }
     }
 
     private fun showVideoInfoBottomSheet(link: String) {
-        val dialog = Dialog(this).apply {
-            setContentView(R.layout.custom_progress_dialog)
-            setCancelable(false)
-            window?.setBackgroundDrawableResource(R.drawable.progress_dialog)
-            window?.setLayout(600, 200)
-        }
+        val dialog =
+            Dialog(this).apply {
+                setContentView(R.layout.custom_progress_dialog)
+                setCancelable(false)
+                window?.setBackgroundDrawableResource(R.drawable.progress_dialog)
+//                window?.setLayout(DIALOG_WIDTH, DIALOG_HEIGHT)
+            }
         dialog.show()
 
         lifecycleScope.launch {
             try {
-                val videoInfo = withContext(Dispatchers.IO) {
-                    getTikTokVideoInfo(link)
-                }
+                val videoInfo =
+                    withContext(Dispatchers.IO) {
+                        getTikTokVideoInfo(link)
+                    }
 
                 dialog.dismiss()
 
                 videoInfo?.let {
                     lastVideoInfo = it
                     val videoInfoBottomSheet = VideoInfoBottomSheetFragment.newInstance(it)
-                    videoInfoBottomSheet.show(supportFragmentManager ,"VideoInfoBottomSheet")
+                    videoInfoBottomSheet.show(supportFragmentManager, "VideoInfoBottomSheet")
                 } ?: showToast("Link không hợp lệ hoặc không thể tải dữ liệu video")
             } catch (e: Exception) {
                 dialog.dismiss()
@@ -211,6 +232,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun showVideoInfoBottomSheet2(videoInfo: TikTokVideoInfo) {
         val videoInfoBottomSheet = VideoInfoBottomSheetFragment.newInstance(videoInfo)
-        videoInfoBottomSheet.show(supportFragmentManager ,"VideoInfoBottomSheet")
+        videoInfoBottomSheet.show(supportFragmentManager, "VideoInfoBottomSheet")
     }
 }
